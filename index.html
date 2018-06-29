@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RPS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="css/style.css" /> -->
+    <link rel="stylesheet" type="text/css" media="screen" href="css/reset.css" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase.js"></script>
+    <!-- <script src="javascript/app.js"></script> -->
+    <style>
+        body {
+            background-color: lightcoral;
+            width: 100%;
+        }
+
+        .box {
+            float: left;
+            /* display: inline-block; */
+            width: 33%;
+
+        }
+
+        #textbox {
+            height: 50px;
+            width: 70%;
+            overflow: scroll;
+            /* margin-left: auto; */
+            /* margin-right: auto; */
+            background-color: white;
+            clear: both;
+        }
+
+        #chatline {
+            width: 70%;
+            /* margin-left: auto; */
+            /* margin-right: auto; */
+        }
+
+        #chatinput {
+            width: 75%;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Rock Paper Scissors</h1>
+        <h2 id="1st"></h2>
+        <!-- <h2>It's Your Turn</h2> -->
+    </header>
+
+    <input type="text" id="text">
+    <input type="submit" value="Start" id="submit">
+
+    <div id="rps">
+        <div class="box">
+            <h3 id="waiting1">Waiting for Player 1</h3>
+
+            <h1 id="r">Rock</h1>
+            <h1 id="p">Paper</h1>
+            <h1 id="s">Scissors</h1>
+
+            <div>
+                Wins:
+                <span></span> Loses:
+                <span></span>
+            </div>
+        </div>
+        <div class="box">
+            <h1>Users</h1>
+            <h1>Wins!/Loses!</h1>
+            <h1>Tie Game</h1>
+
+
+        </div>
+        <div class="box">
+            <h3 id="waiting2">Waiting for Player 2</h3>
+
+            <p>Player</p>
+            <p>Rock</p>
+            <p>Scissors</p>
+
+            <div>
+                Wins:
+                <span></span> Loses:
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat">
+        <div id="textbox">
+
+        </div>
+        <form id="chatline">
+            <input type="text" id="chatinput">
+            <input type="submit" value="Start" id="chatsubmit">
+        </form>
+    </div>
+
+
+    <script>
+        ///  have a click event on the user input create a variable that we use as the reference??
+        ///   also set it to a name variable
+
+        ///use three references
+        var waiting1 = "Waiting for player one";
+        var waiting2 = "Waiting for player two";
+
+        var playerone = waiting1;
+        var playertwo = waiting2;
+
+        var init1;
+        var init2;
+
+        $(document).ready(function () {
+
+            // Initialize Firebase
+            var config = {
+                apiKey: "AIzaSyD4YgnI6g7YeaHyU0SfAeDX9eVH0EshSmU",
+                authDomain: "countdown-7a019.firebaseapp.com",
+                databaseURL: "https://countdown-7a019.firebaseio.com",
+                projectId: "countdown-7a019",
+                storageBucket: "countdown-7a019.appspot.com",
+                messagingSenderId: "336892873235"
+            };
+            firebase.initializeApp(config);
+
+            var database = firebase.database();
+            
+
+
+            //// user sign in
+
+            var username;
+            var newuser = "";
+
+            
+            $("#waiting2").hide();
+            $("#waiting1").show();
+
+            
+            $("#r").on("click", function(){
+                if ((playerNumber % 2) === 1){
+                database.ref("players/1").update({rps:"rock"});
+                
+                }
+                else {
+                    database.ref("players/2").update({ rps: "rock" });
+                    
+                }
+           });
+           $("#p").on("click", function () {
+                if ((playerNumber % 2) === 1) {
+                    database.ref("players/1").update({ rps: "paper" });
+                  
+                }
+                else {
+                    database.ref("players/2").update({ rps: "paper" });
+                    
+                   
+                }
+            });
+            $("#s").on("click", function () {
+                if ((playerNumber % 2) === 1) {
+                    database.ref("players/1").update({ rps: "scissors" });
+                 
+                }
+                else{
+                    database.ref("players/2").update({ rps: "scissors" });
+                }
+            });
+
+           
+
+var players = database.ref("players");
+var playerNumber = 1;
+
+console.log(playerNumber);
+
+            $("#submit").on("click", function(){
+
+                username = $("#text").val();
+
+                if(playerNumber % 2 === 1){
+
+               database.ref("players/1")
+
+                        .set({name: username,
+                            wins: 0,
+                            loses: 0,
+                            rps: "",
+                            // signIn: new Data().toString,
+                        });
+                        } else {
+
+
+                    database.ref("players/2")
+                    .set({
+                        name: username,
+                        wins: 0,
+                        loses: 0,
+                        rps: "",
+                        // signIn: new Data().toString,
+                        
+                    });
+                }
+                
+                // event.preventDefault();
+
+                
+                console.log(username);
+                // firebase.database().ref("players/1");
+                console.log(playerNumber);
+            });
+
+            
+            firebase.database().ref().set("players");
+
+            players.on("value", function(snap){
+                console.log(snap.val());
+                console.log(snap.child("1").val().rps);
+
+                    if((playerNumber % 2) === 0){
+                        $("#waiting2").hide();
+                        $("#waiting1").show();
+                    }
+                    else{
+                        $("#waiting1").hide();
+                        $("#waiting2").show();
+                    }
+
+                     playerNumber++;
+                     console.log(playerNumber);
+                
+
+                    if (snap.child("1").val().rps === "rock" && snap.child("2").val().rps === "paper") {
+                        turn2();
+                    }
+                    if (snap.child("1").val().rps === "rock" && snap.child("2").val().rps === "scissors") {
+                        turn1();
+                    }
+                    if (snap.child("1").val().rps === "rock" && snap.child("2").val().rps === "rock") {
+                        turn();
+                    }
+    
+                    if (snap.child("1").val().rps === "scissors" && snap.child("2").val().rps === "paper") {
+                        turn1();
+                    }
+                    if (snap.child("1").val().rps === "scissors" && snap.child("2").val().rps === "rock") {
+                       turn2();
+                    }
+                    if (snap.child("1").val().rps === "paper" && snap.child("2").val().rps === "paper") {
+                        turn();
+                    }
+    
+                    if (snap.child("1").val().rps === "paper" && snap.child("2").val().rps === "rock") {
+                       turn2();
+                    }
+                    if (snap.child("1").val().rps === "paper" && snap.child("2").val().rps === "scissors") {
+                        turn1();
+                    }
+                    if (snap.child("1").val().rps === "scissors" && snap.child("2").val().rps === "scissors") {
+                        turn();
+                    }
+    
+                            
+            });
+
+            var wins1 = 0;
+            var wins2 = 0;
+            var loses1 = 0;
+            var loses2 = 0;
+
+            function turn1(){
+                wins1++;
+                loses2++;
+                database.ref("players/1").update({rps: "", wins: wins1});
+                database.ref("players/2").update({rps: "", loses: loses2});
+                // playerNumber--;
+            }
+
+            function turn2() {
+                wins2++;
+                loses1++;
+                database.ref("players/1").update({ rps: "", loses: loses1});
+                database.ref("players/2").update({ rps: "", wins: wins2 });
+                // playerNumber--;
+            }
+            function turn() {
+                database.ref("players/1").update({ rps: ""});
+                database.ref("players/2").update({ rps: ""});
+                // playerNumber--;
+            }
+
+//////////////////////////////////////////////////////presence tests
+
+            var presenceRef = firebase.database().ref("players");
+            // Write a string when this client loses connection
+            presenceRef.onDisconnect().remove();
+
+///////////////////////////////////////////////////////////////
+
+            function removeChild(ref){
+                ref.remove();
+            }
+
+           
+
+            ///chatlog input
+            $("#chatsubmit").on("click", function () {
+                event.preventDefault();
+                var input = $("#chatinput").val();
+                console.log(input);
+                database.ref("input").push({
+                    input: input,
+                });
+                $("#chatinput").val("");
+            });
+
+            ///chatlogdraw
+
+            // Firebase watcher .on("child_added"
+            database.ref("input").on("child_added", function (childSnapshot, prevChildKey) {
+                // storing the snapshot.val() in a variable for convenience
+
+                var sv = childSnapshot.val();
+                // var psv = prevChildKey.val();
+                console.log(childSnapshot);
+
+                let input = sv.input;
+                // Console.loging the last user's data
+                let p = $("<p>");
+                p.text(input);
+                // Change the HTML to reflect
+                console.log(p);
+                $("#textbox").append(p);
+
+                // Handle the errors
+            }, function (errorObject) {
+                console.log("Errors handled: " + errorObject.code);
+            });
+
+            ///chatlogclear
+            function clearChat() {
+                var input = "";
+                console.log(input);
+                database.ref("input").set({
+                    input: input,
+                });
+                $("#chatinput").val("");
+            }
+            ///this clears on pageload. find a way to do it when the page closes. This will reset the chat every
+            // time someone loads the page.
+            clearChat();
+
+
+        });
+    </script>
+</body>
+
+</html>
